@@ -7,5 +7,72 @@ body {
   position: absolute;
   top: 0; 
   bottom: 0; 
-  width: 100%; 
+  float: right;
+  width: 100%;
+  transition: .5s ease-in-out;
+}
+
+/* #sidebar{
+  position: fixed;
+  width: 15%;
+  height: 100%;
+  background-color: #424242;
+
+} */
+
+.close-menu {
+  display: none;
+}
+
+#sidebar {
+  position: fixed;
+  background: #424242;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  overflow-y: auto;
+  transition: .5s ease-in-out;
+}
+
+
+
+#sidebar:target {
+  width: 20%;
+  
+}
+
+#header{
+  
+}
+
+#header a {
+  position: absolute;
+  text-decoration: none;
+  color: white;
+  font-size: 40px;
+  top: 20px;
+  left: 20px;
+}
+
+#sidebar:target + #map {
+  width: 80%;
+  transition: .5s ease-in-out;
+
+  #header {
+    width: 80%;
+    left: 20%;
+    transition: .5s ease-in-out;
+  }
+
+  .open-menu {
+    display: none;
+  }
+  
+
+  .close-menu {
+    display: block;
+  }
+  
+  
 }
