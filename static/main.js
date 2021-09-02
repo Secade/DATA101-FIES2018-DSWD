@@ -8,7 +8,7 @@ $(document).ready(function () {
 
     var map = new mapboxgl.Map({
         container: 'map', // container ID
-        style: 'mapbox://styles/mapbox/dark-v10', // style URL
+        style: 'mapbox://styles/secade/ckt2o6v2f1l6017q9my3hm6a8', // style URL
         center: [122.22, 12.53], // starting position [lng, lat]
         zoom: 5, // starting zoom,
         minZoom: 5,
@@ -17,6 +17,7 @@ $(document).ready(function () {
     });
 
     map.on('load', () => {
+
         map.on('click', function (e) {
             console.log(e);
 
@@ -35,6 +36,8 @@ $(document).ready(function () {
             type: 'vector',
             url: 'mapbox://secade.6v2gs6xf',
         });
+
+        
 
         map.addLayer({
             id: 'prov',

@@ -18,7 +18,6 @@ def get_data():
 def get_population_data(population):
     ## TODO: Get the data filtered by the provided country in the argument
     df = pd.read_csv(data_url)
-    print(df)
     df_group_count = df[df['Province Name']==population].count()
 
     #print(df_group_count)
