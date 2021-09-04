@@ -9,21 +9,29 @@ data_url = 'Filtered FIES2018.csv'
 @app.route('/data')
 def get_data():
     df = pd.read_csv(data_url)
-    # df.columns = ['country', 'category', 'consumption', 'co2']
 
     data_json = df.to_json(orient="records")
     return Response(data_json, mimetype="application/json")
 
 @app.route('/data/<population>')
 def get_population_data(population):
-    ## TODO: Get the data filtered by the provided country in the argument
     df = pd.read_csv(data_url)
     df_group_count = df[df['Province Name']==population].count()
 
-    #print(df_group_count)
-
     filtered_df= df_group_count.to_json(orient="records")
     
+    return Response(filtered_df, mimetype="application/json")
+
+@app.route('/filters')
+def get_filters():
+    df = pd.read_csv(data_url)
+    df_actual=df[['Meat', 'Fish and Seafood', 'Milk, Cheese and Eggs', 'Oils and Fats','Fruit','Vegetables','Sugar, Jam and Honey, Chocolate and Confectionery','Coffee, Tea and Cocoa','Mineral Water, Softdrinks, Fruit and Vegetable Juices','Clothing and Footwear','Health','Education'
+    ,'Alcoholic Beverages','Tobacco','Transport','Communication','Recreation and Culture','Special Family Occasion'
+    ,'Total Income','Total Food Expenditures','Total Non-Food Expenditure','Total Expenditure']]
+    df_filter = list(df_actual.columns)
+
+    filtered_df= pd.DataFrame(df_filter).to_json(orient="records")
+
     return Response(filtered_df, mimetype="application/json")
 
 # STATIC PAGES

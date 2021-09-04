@@ -1,6 +1,17 @@
 $(document).ready(function () {
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2VjYWRlIiwiYSI6ImNrcnU3cHVnNDNvZHQycHRqZnZnNzQxYXQifQ.F-OV6UiB-D5fepALN_4stA';
 
+    var countryselect = $("#countryselect");
+
+    d3.json('/filters').then(function(data){
+        console.log(data)
+        data.forEach(function(elem,i){
+          countryselect.append('<option value="'+elem['0']+'">'+elem['0']+'</option>');
+    
+        });
+      });
+
+
     const bounds = [
         [105, -2], // Southwest coordinates
         [140, 28] // Northeast coordinates

@@ -17,5 +17,11 @@ body {
   width: 25%;
   height: 100%;
   background-color: #424242;
+  /* Temporary Font */
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  color: #EEEEEE;
+}
 
+#countryselect{
+  width: 50%;
 }
