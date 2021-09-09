@@ -8,10 +8,8 @@ $(document).ready(function () {
         console.log(data)
         data.forEach(function (elem, i) {
             filterselect.append('<option value="' + elem['0'] + '">' + elem['0'] + '</option>');
-
         });
     });
-
 
     const bounds = [
         [105, -2], // Southwest coordinates
@@ -19,10 +17,10 @@ $(document).ready(function () {
     ];
 
     var map = new mapboxgl.Map({
-        container: 'map', // container ID
-        style: 'mapbox://styles/secade/ckt2o6v2f1l6017q9my3hm6a8', // style URL
-        center: [122.22, 12.53], // starting position [lng, lat]
-        zoom: 5, // starting zoom,
+        container: 'map',
+        style: 'mapbox://styles/secade/ckt2o6v2f1l6017q9my3hm6a8',
+        center: [122.22, 12.53],
+        zoom: 5,
         minZoom: 5,
         maxZoom: 10,
         maxBounds: bounds
@@ -48,8 +46,6 @@ $(document).ready(function () {
             type: 'vector',
             url: 'mapbox://secade.6v2gs6xf',
         });
-
-
 
         map.addLayer({
             id: 'prov',
@@ -99,19 +95,28 @@ $(document).ready(function () {
             }
         }, 'waterway-label');
 
-
-
         map.on('click', 'reg', (e) => {
             console.log(e.features[0]);
             new mapboxgl.Popup()
                 .setLngLat(e.lngLat)
                 .setHTML("<b>" + e.features[0].properties['REGION'] + "</b>")
                 .addTo(map);
+
+            $("#location").text("Selected Location: " + e.features[0].properties['REGION']);
         });
 
         map.on('click', 'prov', (e) => {
             console.log(e.features[0]);
             prov_name = e.features[0].properties['NAME_1']
+
+            d3.json('/filters/' + e.features[0].properties['NAME_1']).then(function (data) {
+                console.log(data[0])
+
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML("<b>" + prov_name + "</b><br><p>Respondents: " + data[0] + "</p>")
+                    .addTo(map);
+            });
 
             d3.json('/data/' + e.features[0].properties['NAME_1']).then(function (data) {
                 console.log(data[0])
@@ -121,16 +126,17 @@ $(document).ready(function () {
                     .setHTML("<b>" + prov_name + "</b><br><p>Respondents: " + data[0] + "</p>")
                     .addTo(map);
             });
+
+            $("#location").text("Selected Location: " + e.features[0].properties['NAME_1']);
         });
 
         map.on('zoom', () => {
             if (map.getZoom() > 7) {
-            currentLevel = 'province'
+                currentLevel = 'province'
             } else {
-            currentLevel = 'region'
+                currentLevel = 'region'
             }
-            });
-
+        });
 
     });
 
@@ -144,29 +150,19 @@ $(document).ready(function () {
         .attr("height", h);
 
     var maxRatio, regions,
-        xScale, yScale,
-        xAxis,
-        yAxis;
+        xScale, yScale;
 
-    function getRandomColor() {
-        var letters = '0123456789ABCDEF'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
+    d3.json('/region/Total Expenditure').then(function (data) {
+
+        if (currentLevel == 'province') {
+            data = data.slice(0, 10);
         }
-        return color;
-    }
 
-    d3.json('/filters/Meat').then(function (data) {
-        data.sort(function(a,b) { return b.filter - a.filter;});
-
-        if(currentLevel=='province'){
-            data=data.slice(0,10);
-        }
+        data.sort(function (a, b) { return b.filter - a.filter; });
 
         maxRatio = d3.max(data, function (d) { return d.filter; });
 
-        regions = data.map(function (d) { return eval("d."+currentLevel); });
+        regions = data.map(function (d) { return eval("d." + currentLevel); });
 
         xScale = d3.scaleLinear([0, maxRatio], [padding, w - padding_left]);
 
@@ -193,37 +189,35 @@ $(document).ready(function () {
             .attr("x", w / 2)
             .attr("y", h - padding + 40)
             .attr("text-anchor", "middle")
-            .text(" Spending (Pesos)");
+            .text("Total Expenditure (Pesos)");
 
         bar.selectAll("rect")
             .data(data)
             .join("rect")
             .attr("x", padding_left + 1)
-            .attr("y", d => yScale(eval("d."+currentLevel)))
-            .attr("width", 0)
+            .attr("y", d => yScale(eval("d." + currentLevel)))
+            .attr("width", d => xScale(d.filter) - 50)
             .attr("height", d => yScale.bandwidth())
             .style("fill", "darkblue")
 
     });
 
     $("#filterselect").on("change", function (event) {
-        // console.log(event);
         var selected_filter = $("#filterselect").val();
 
         var t = bar.transition()
             .duration(1000);
 
-        //console.log(selected_country);
-        d3.json('/filters/' + selected_filter).then(function (data) {
-            data.sort(function(a,b) { return b.filter - a.filter;});
+        d3.json('/' + currentLevel + '/' + selected_filter).then(function (data) {
+            data.sort(function (a, b) { return b.filter - a.filter; });
 
-            if(currentLevel=='province'){
-                data=data.slice(0,10);
+            if (currentLevel == 'province') {
+                data = data.slice(0, 10);
             }
 
             maxRatio = d3.max(data, function (d) { return d.filter; });
 
-            regions = data.map(function (d) { return eval("d."+currentLevel); });
+            regions = data.map(function (d) { return eval("d." + currentLevel); });
 
             xScale = d3.scaleLinear([0, maxRatio], [padding, w - padding_left]);
 
@@ -247,21 +241,23 @@ $(document).ready(function () {
                         .call(yAxis);
                 });
 
-              bar.select("#tableText").text(selected_filter+" Spending (Pesos)");
-              
+            bar.select("#tableText").text(selected_filter + " Spending (Pesos)");
+
             bar.selectAll("rect")
                 .data(data)
                 .join(function (enter) {
                     enter.append("rect")
                         .attr("x", padding_left + 1)
-                        .attr("y", d => yScale(eval("d."+currentLevel)))
-                        .attr("width", d => xScale(d.filter))
+                        .attr("y", d => yScale(eval("d." + currentLevel)))
+                        .attr("width", d => xScale(d.filter) - 50)
                         .attr("height", d => yScale.bandwidth())
                         .style("fill", "darkblue");
                 }, function (update) {
                     update.call(function (update) {
                         update.transition(t)
-                            .attr("width", d => xScale(d.filter))
+                            .attr("x", padding_left + 1)
+                            .attr("y", d => yScale(eval("d." + currentLevel)))
+                            .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
                             .style("fill", "darkblue");
                     })
