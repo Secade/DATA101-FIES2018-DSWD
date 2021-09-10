@@ -48,8 +48,6 @@ $(document).ready(function () {
             url: 'mapbox://secade.6v2gs6xf',
         });
 
-        
-
         map.addLayer({
             id: 'prov',
             type: 'fill',
@@ -76,7 +74,7 @@ $(document).ready(function () {
 
         map.addLayer({
             id: 'reg',
-            type: 'fill',
+             type: 'fill',
             source: 'regions',
             'source-layer': 'gadm36_PHL-49t1ot',
             'maxzoom': 7,
@@ -121,6 +119,15 @@ $(document).ready(function () {
                     .addTo(map);
             });
         });
+    });
+
+    $("#countryselect").on("change", () => {
+        let val = $("#countryselect").val();
+
+        ids = ['reg', 'prov']
+        ids.forEach(id => {
+            map.setPaintProperty(id, 'fill-color', "#ffffff")
+        })
     });
 });
 
