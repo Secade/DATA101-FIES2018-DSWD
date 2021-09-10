@@ -1,11 +1,13 @@
 $(document).ready(function () {
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2VjYWRlIiwiYSI6ImNrcnU3cHVnNDNvZHQycHRqZnZnNzQxYXQifQ.F-OV6UiB-D5fepALN_4stA';
 
+
+    var maxRatio, regions,
+        xScale, yScale, t;
     var filterselect = $("#filterselect");
     var currentLevel = 'region';
 
     d3.json('/filters').then(function (data) {
-        console.log(data)
         data.forEach(function (elem, i) {
             filterselect.append('<option value="' + elem['0'] + '">' + elem['0'] + '</option>');
         });
@@ -28,12 +30,11 @@ $(document).ready(function () {
 
     map.on('load', () => {
 
-        map.on('click', function (e) {
-            console.log(e);
-
-            console.log(map.getCenter());
-            console.log(map.getZoom());
-        });
+        // map.on('click', function (e) {
+        //     console.log(e);
+        //     console.log(map.getCenter());
+        //     console.log(map.getZoom());
+        // });
 
         map.addControl(new mapboxgl.NavigationControl());
 
@@ -96,34 +97,33 @@ $(document).ready(function () {
         }, 'waterway-label');
 
         map.on('click', 'reg', (e) => {
-            console.log(e.features[0]);
-            new mapboxgl.Popup()
-                .setLngLat(e.lngLat)
-                .setHTML("<b>" + e.features[0].properties['REGION'] + "</b>")
-                .addTo(map);
+            region_name = e.features[0].properties['REGION'];
+            var results = -1;
 
-            $("#location").text("Selected Location: " + e.features[0].properties['REGION']);
-        });
-
-        map.on('click', 'prov', (e) => {
-            console.log(e.features[0]);
-            prov_name = e.features[0].properties['NAME_1']
-
-            d3.json('/filters/' + e.features[0].properties['NAME_1']).then(function (data) {
-                console.log(data[0])
-
+            d3.json('/reg/' + e.features[0].properties['REGION']).then(function (data) {
+                results = data.find(obj => {
+                    return obj.region === region_name
+                });
                 new mapboxgl.Popup()
                     .setLngLat(e.lngLat)
-                    .setHTML("<b>" + prov_name + "</b><br><p>Respondents: " + data[0] + "</p>")
+                    .setHTML("<b>" + region_name + "</b><br><p>Correspondents: " + results.count + "</p><p>Average Spending for " + filterselect.val() + ": P" + results.filter.toFixed(2) + "</p>")
                     .addTo(map);
             });
 
-            d3.json('/data/' + e.features[0].properties['NAME_1']).then(function (data) {
-                console.log(data[0])
+            $("#location").text("Selected Location: " + region_name);
+        });
 
+        map.on('click', 'prov', (e) => {
+            prov_name = e.features[0].properties['NAME_1'];
+            var result = -1;
+
+            d3.json('/prov/' + e.features[0].properties['NAME_1']).then(function (data) {
+                result = data.find(obj => {
+                    return obj.province === prov_name
+                });
                 new mapboxgl.Popup()
                     .setLngLat(e.lngLat)
-                    .setHTML("<b>" + prov_name + "</b><br><p>Respondents: " + data[0] + "</p>")
+                    .setHTML("<b>" + prov_name + "</b><br><p>Correspondents: " + result.count + "</p><p>Average Spending for " + filterselect.val() + ": P" + result.filter.toFixed(2) + "</p>")
                     .addTo(map);
             });
 
@@ -131,11 +131,14 @@ $(document).ready(function () {
         });
 
         map.on('zoom', () => {
-            if (map.getZoom() > 7) {
+            if (map.getZoom() >= 7 && map.getZoom() <= 8 && currentLevel != 'province') {
                 currentLevel = 'province'
-            } else {
+                $("#filterselect").val($("#filterselect").val()).change();
+            } else if (map.getZoom() >= 6 && map.getZoom() <= 7 && currentLevel != 'region') {
                 currentLevel = 'region'
+                $("#filterselect").val($("#filterselect").val()).change();
             }
+
         });
 
     });
@@ -149,8 +152,7 @@ $(document).ready(function () {
         .attr("width", w)
         .attr("height", h);
 
-    var maxRatio, regions,
-        xScale, yScale;
+
 
     d3.json('/region/Total Expenditure').then(function (data) {
 
@@ -189,7 +191,7 @@ $(document).ready(function () {
             .attr("x", w / 2)
             .attr("y", h - padding + 40)
             .attr("text-anchor", "middle")
-            .text("Total Expenditure (Pesos)");
+            .text("Total Expenditure Spending (Pesos)");
 
         bar.selectAll("rect")
             .data(data)
@@ -205,10 +207,10 @@ $(document).ready(function () {
     $("#filterselect").on("change", function (event) {
         var selected_filter = $("#filterselect").val();
 
-        var t = bar.transition()
-            .duration(1000);
+
 
         d3.json('/' + currentLevel + '/' + selected_filter).then(function (data) {
+            console.log("CHANGING")
             data.sort(function (a, b) { return b.filter - a.filter; });
 
             if (currentLevel == 'province') {
@@ -228,6 +230,9 @@ $(document).ready(function () {
 
             var xAxis = d3.axisBottom(xScale);
             var yAxis = d3.axisLeft(yScale);
+
+            var t = bar.transition()
+                .duration(1000);
 
             bar.select("#xAxis")
                 .call(function (update) {
