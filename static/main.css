@@ -7,14 +7,14 @@ body {
   position: absolute;
   top: 0; 
   bottom: 0; 
-  left: 25%;
-  width: 75%;
+  left: 30%;
+  width: 70%;
   transition: .5s ease-in-out;
 }
 
 #sidebar{
   position: fixed;
-  width: 25%;
+  width: 30%;
   height: 100%;
   background-color: #424242;
   /* Temporary Font */
@@ -22,6 +22,6 @@ body {
   color: #EEEEEE;
 }
 
-#countryselect{
+#filterselect{
   width: 50%;
 }
