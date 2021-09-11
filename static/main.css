@@ -20,6 +20,7 @@ body {
   /* Temporary Font */
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   color: #EEEEEE;
+  overflow: auto;
 }
 
 #filterselect{
