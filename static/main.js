@@ -7,6 +7,30 @@ $(document).ready(function () {
     var filterselect = $("#filterselect");
     var currentLevel = 'region';
 
+    function updateChoroplethMap(fullData, currentLevel) {
+        ids = {region : 'reg', province : 'prov'}
+        get_field = {region: 'REGION', province : 'NAME_1'};
+
+        colors = ['#ffffcc','#ffeda0','#fed976','#feb24c','#fd8d3c','#fc4e2a','#e31a1c','#bd0026','#800026']
+        chunks = 9
+        // bin filtered data into 9 chunks for choropleth map
+        bin9chunks = d3.bin()
+            .value(d => d.filter)
+            .thresholds((data, min, max) => 
+                d3.range(chunks).map(t => min + (t / chunks) * (max - min))
+            )
+        
+        const matchExpression = ['match', ['get', get_field[currentLevel]]];
+        // Calculate color values for each region
+        bin9chunks(fullData).forEach((chunkGroup, i) => {
+            chunkGroup.forEach((area) => {
+                matchExpression.push(area[currentLevel], colors[i])
+            })
+        })
+        matchExpression.push('#000000')
+        map.setPaintProperty(ids[currentLevel], 'fill-color', matchExpression)
+    }
+
     d3.json('/filters').then(function (data) {
         data.forEach(function (elem, i) {
             filterselect.append('<option value="' + elem['0'] + '">' + elem['0'] + '</option>');
@@ -55,6 +79,7 @@ $(document).ready(function () {
             'source-layer': 'PHL_provinces-35svai',
             'minzoom': 7,
             paint: {
+                /*
                 'fill-color': [
                     'interpolate',
                     ['linear'],
@@ -67,7 +92,7 @@ $(document).ready(function () {
                     873576243, '#41ae76',
                     1048289162, '#238b45',
                     1397715000, '#005824',
-                ],
+                ], */
                 'fill-outline-color': '#777777'
             }
         }, 'waterway-label');
@@ -79,6 +104,7 @@ $(document).ready(function () {
             'source-layer': 'gadm36_PHL-49t1ot',
             'maxzoom': 7,
             paint: {
+                /*
                 'fill-color': [
                     'interpolate',
                     ['linear'],
@@ -91,7 +117,7 @@ $(document).ready(function () {
                     873576243, '#41ae76',
                     1048289162, '#238b45',
                     1397715000, '#005824',
-                ],
+                ], */
                 'fill-outline-color': '#777777'
             }
         }, 'waterway-label');
@@ -139,6 +165,10 @@ $(document).ready(function () {
                 $("#filterselect").val($("#filterselect").val()).change();
             }
 
+        });
+
+        d3.json('/region/Total Expenditure').then(function (data) {
+            updateChoroplethMap(data, currentLevel);
         });
 
     });
@@ -204,21 +234,11 @@ $(document).ready(function () {
 
     });
 
-    $("#countryselect").on("change", () => {
-        let val = $("#countryselect").val();
-
-        ids = ['reg', 'prov']
-        ids.forEach(id => {
-            map.setPaintProperty(id, 'fill-color', "#ffffff")
-        })
-    });
-
     $("#filterselect").on("change", function (event) {
         var selected_filter = $("#filterselect").val();
 
-
-
         d3.json('/' + currentLevel + '/' + selected_filter).then(function (data) {
+            fullData = data;
             console.log("CHANGING")
             data.sort(function (a, b) { return b.filter - a.filter; });
 
@@ -283,8 +303,10 @@ $(document).ready(function () {
                                 .attr("height", d => yScale(0))
                                 .remove();
                         })
-                }
-                )
+                })
+            
+            updateChoroplethMap(fullData, currentLevel)
+            
         });
     });
 });
