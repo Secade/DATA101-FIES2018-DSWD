@@ -13,11 +13,22 @@ def get_data():
     data_json = df.to_json(orient="records")
     return Response(data_json, mimetype="application/json")
 
+@app.route('/descriptions/<filter>')
+def get_desc(filter):
+    df = pd.read_csv("Filter Descriptions.csv")
+
+    gk = df.groupby('filter')
+
+    gg = gk.get_group(filter)
+
+    data_json = gg.to_json(orient="records")
+    return Response(data_json, mimetype="application/json")
+
 @app.route('/prov/<population>')
 def get_prov_population_data(population):
     df = pd.read_csv(data_url)
 
-    df_actual=df[['Province Name',"Meat"]]
+    df_actual=df[['Province Name',population]]
     
     df_actual.columns = ['province', 'filter']
 
@@ -38,7 +49,7 @@ def get_prov_population_data(population):
 def get_region_population_data(population):
     df = pd.read_csv(data_url)
 
-    df_actual=df[['Region Name',"Meat"]]
+    df_actual=df[['Region Name',population]]
     
     df_actual.columns = ['region', 'filter']
 

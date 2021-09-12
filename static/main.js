@@ -183,18 +183,18 @@ $(document).ready(function () {
     var currentLevel = 'region';
 
     function updateChoroplethMap(fullData, currentLevel) {
-        ids = {region : 'reg', province : 'prov'}
-        get_field = {region: 'REGION', province : 'NAME_1'};
+        ids = { region: 'reg', province: 'prov' }
+        get_field = { region: 'REGION', province: 'NAME_1' };
 
-        colors = ['#ffffcc','#ffeda0','#fed976','#feb24c','#fd8d3c','#fc4e2a','#e31a1c','#bd0026','#800026']
+        colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
         chunks = 9
         // bin filtered data into 9 chunks for choropleth map
         bin9chunks = d3.bin()
             .value(d => d.filter)
-            .thresholds((data, min, max) => 
+            .thresholds((data, min, max) =>
                 d3.range(chunks).map(t => min + (t / chunks) * (max - min))
             )
-        
+
         const matchExpression = ['match', ['get', get_field[currentLevel]]];
         // Calculate color values for each region
         bin9chunks(fullData).forEach((chunkGroup, i) => {
@@ -269,13 +269,13 @@ $(document).ready(function () {
                 //     1048289162, '#e64a19',
                 //     1397715000, '#e64a19',
                 // ]
-                ,'fill-outline-color': '#111111'
+                , 'fill-outline-color': '#111111'
             }
         }, 'waterway-label');
 
         map.addLayer({
             id: 'reg',
-             type: 'fill',
+            type: 'fill',
             source: 'regions',
             'source-layer': 'gadm36_PHL-49t1ot',
             'maxzoom': 7,
@@ -294,7 +294,7 @@ $(document).ready(function () {
                 //     1048289162, '#e64a19',
                 //     1397715000, '#e64a19',
                 // ]
-                ,'fill-outline-color': '#111111'
+                , 'fill-outline-color': '#111111'
             }
         }, 'waterway-label');
 
@@ -330,7 +330,7 @@ $(document).ready(function () {
             region_name = e.features[0].properties['REGION'];
             var results = -1;
 
-            d3.json('/reg/' + e.features[0].properties['REGION']).then(function (data) {
+            d3.json('/reg/' + filterselect.val()).then(function (data) {
                 results = data.find(obj => {
                     return obj.region === region_name
                 });
@@ -347,7 +347,7 @@ $(document).ready(function () {
             prov_name = e.features[0].properties['NAME_1'];
             var result = -1;
 
-            d3.json('/prov/' + e.features[0].properties['NAME_1']).then(function (data) {
+            d3.json('/prov/' + filterselect.val()).then(function (data) {
                 result = data.find(obj => {
                     return obj.province === prov_name
                 });
@@ -565,8 +565,9 @@ $(document).ready(function () {
             .attr("height", d => yScale.bandwidth())
             .style("fill", "#1e88e5")
 
-        $("#explanation").text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
-
+        d3.json('/descriptions/Total Expenditure').then(function (data) {
+            $("#explanation").text(data[0].desc)
+        });
     });
 
     d3.json('/' + currentLevel + '/nonessentials').then(function (data) {
@@ -616,7 +617,7 @@ $(document).ready(function () {
             .attr("width", d => xScale(d.mean) - 50)
             .attr("height", d => yScale.bandwidth())
             .style("fill", "#1e88e5")
-        
+
         updateChoroplethMap(fullData, currentLevel);
     });
 
@@ -668,7 +669,7 @@ $(document).ready(function () {
                             .call(yAxis);
                     });
 
-                bar.select("#tableText").text("Average "+selected_filter + " Spending (Pesos)");
+                bar.select("#tableText").text("Average " + selected_filter + " Spending (Pesos)");
 
                 bar.selectAll("rect")
                     .data(data)
@@ -698,7 +699,7 @@ $(document).ready(function () {
                             })
                     }
                     )
-                
+
                 updateChoroplethMap(fullData, currentLevel)
             });
 
@@ -815,9 +816,9 @@ $(document).ready(function () {
                     )
             });
 
-            $("#explanation").text("LMAO ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
-
-
+            d3.json('/descriptions/' + selected_filter).then(function (data) {
+                $("#explanation").text(data[0].desc)
+            });
         } else {
             $("#extraBar").css("display", "block");
 
