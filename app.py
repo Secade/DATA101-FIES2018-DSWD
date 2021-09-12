@@ -1,5 +1,6 @@
 from flask import Flask, Response
 import pandas as pd
+import requests
 
 app = Flask(__name__)
 
@@ -209,4 +210,4 @@ def index():
     return app.send_static_file('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
