@@ -411,7 +411,7 @@ $(document).ready(function () {
             .attr("x", width / 2)
             .attr("y", height + 40)
             .attr("text-anchor", "middle")
-            .text("Pesos");
+            .text("Total Expenditure Spending (Pesos)");
 
         histo.append("text")
             .attr("id", "ytableText")
@@ -523,7 +523,7 @@ $(document).ready(function () {
             .attr("x", w / 2)
             .attr("y", h - padding + 40)
             .attr("text-anchor", "middle")
-            .text("Total Expenditure Spending (Pesos)");
+            .text("Average Total Expenditure Spending (Pesos)");
 
         bar.selectAll("rect")
             .data(data)
@@ -632,7 +632,7 @@ $(document).ready(function () {
                             .call(yAxis);
                     });
 
-                bar.select("#tableText").text(selected_filter + " Spending (Pesos)");
+                bar.select("#tableText").text("Average "+selected_filter + " Spending (Pesos)");
 
                 bar.selectAll("rect")
                     .data(data)
