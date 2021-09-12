@@ -182,6 +182,30 @@ $(document).ready(function () {
     var filterselect = $("#filterselect");
     var currentLevel = 'region';
 
+    function updateChoroplethMap(fullData, currentLevel) {
+        ids = {region : 'reg', province : 'prov'}
+        get_field = {region: 'REGION', province : 'NAME_1'};
+
+        colors = ['#ffffcc','#ffeda0','#fed976','#feb24c','#fd8d3c','#fc4e2a','#e31a1c','#bd0026','#800026']
+        chunks = 9
+        // bin filtered data into 9 chunks for choropleth map
+        bin9chunks = d3.bin()
+            .value(d => d.filter)
+            .thresholds((data, min, max) => 
+                d3.range(chunks).map(t => min + (t / chunks) * (max - min))
+            )
+        
+        const matchExpression = ['match', ['get', get_field[currentLevel]]];
+        // Calculate color values for each region
+        bin9chunks(fullData).forEach((chunkGroup, i) => {
+            chunkGroup.forEach((area) => {
+                matchExpression.push(area[currentLevel], colors[i])
+            })
+        })
+        matchExpression.push('#000000')
+        map.setPaintProperty(ids[currentLevel], 'fill-color', matchExpression)
+    }
+
     d3.json('/filters').then(function (data) {
         data.forEach(function (elem, i) {
             filterselect.append('<option value="' + elem['0'] + '">' + elem['0'] + '</option>');
@@ -251,7 +275,7 @@ $(document).ready(function () {
 
         map.addLayer({
             id: 'reg',
-            type: 'fill',
+             type: 'fill',
             source: 'regions',
             'source-layer': 'gadm36_PHL-49t1ot',
             'maxzoom': 7,
@@ -348,6 +372,11 @@ $(document).ready(function () {
                 map.setLayoutProperty('poi-labels', 'visibility', 'visible');
             }
         });
+
+        d3.json('/region/Total Expenditure').then(function (data) {
+            updateChoroplethMap(data, currentLevel);
+        });
+
     });
 
     var w = 600;
@@ -541,7 +570,7 @@ $(document).ready(function () {
     });
 
     d3.json('/' + currentLevel + '/nonessentials').then(function (data) {
-
+        let fullData = data;
         if (currentLevel == 'province') {
             data = data.slice(0, 15);
         }
@@ -587,6 +616,8 @@ $(document).ready(function () {
             .attr("width", d => xScale(d.mean) - 50)
             .attr("height", d => yScale.bandwidth())
             .style("fill", "#1e88e5")
+        
+        updateChoroplethMap(fullData, currentLevel);
     });
 
     $("#extraBar").css("display", "none");
@@ -599,6 +630,9 @@ $(document).ready(function () {
             $("#extraHistogram").css("display", "none");
 
             d3.json('/' + currentLevel + '/' + selected_filter).then(function (data) {
+                fullData = data;
+                updateChoroplethMap(fullData, currentLevel);
+
                 data.sort(function (a, b) { return b.filter - a.filter; });
 
                 if (currentLevel == 'province') {
@@ -664,6 +698,8 @@ $(document).ready(function () {
                             })
                     }
                     )
+                
+                updateChoroplethMap(fullData, currentLevel)
             });
 
             d3.json('/histo/' + selected_filter).then(function (data) {
@@ -786,6 +822,9 @@ $(document).ready(function () {
             $("#extraBar").css("display", "block");
 
             d3.json('/' + currentLevel + '/essentials').then(function (data) {
+                fullData = data;
+                updateChoroplethMap(fullData, currentLevel);
+
                 data.sort(function (a, b) { return b.mean - a.mean; });
                 if (currentLevel == 'province') {
                     data = data.slice(0, 15);
@@ -853,6 +892,9 @@ $(document).ready(function () {
             });
 
             d3.json('/' + currentLevel + '/nonessentials').then(function (data) {
+                fullData = data;
+                updateChoroplethMap(fullData, currentLevel);
+
                 data.sort(function (a, b) { return b.mean - a.mean; });
                 if (currentLevel == 'province') {
                     data = data.slice(0, 15);
