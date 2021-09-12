@@ -16,10 +16,10 @@ body {
   position: fixed;
   width: 35%;
   height: 100%;
-  background-color: #424242;
+  background-color: #EEEEEE;
   /* Temporary Font */
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-  color: #EEEEEE;
+  color: #424242;
   overflow: auto;
 }
 

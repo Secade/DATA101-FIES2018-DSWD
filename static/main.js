@@ -195,7 +195,7 @@ $(document).ready(function () {
 
     var map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/secade/ckt2o6v2f1l6017q9my3hm6a8',
+        style: 'mapbox://styles/secade/cktgt3viq1nn618qt9qx24itp',
         center: [122.22, 12.53],
         zoom: 5,
         minZoom: 5,
@@ -231,20 +231,21 @@ $(document).ready(function () {
             'source-layer': 'PHL_provinces-35svai',
             'minzoom': 7,
             paint: {
-                'fill-color': [
-                    'interpolate',
-                    ['linear'],
-                    ['get', 'NAME_1'],
-                    0, '#ffffff',
-                    11646, '#edf8fb',
-                    174725666, '#ccece6',
-                    349437485, '#99d8c9',
-                    698863323, '#66c2a4',
-                    873576243, '#41ae76',
-                    1048289162, '#238b45',
-                    1397715000, '#005824',
-                ],
-                'fill-outline-color': '#777777'
+                'fill-color': '#b71c1c'
+                // [
+                //     'interpolate',
+                //     ['linear'],
+                //     ['get', 'REGION'],
+                //     0, '#e64a19',
+                //     11646, '#e64a19',
+                //     174725666, '#e64a19',
+                //     349437485, '#e64a19',
+                //     698863323, '#e64a19',
+                //     873576243, '#e64a19',
+                //     1048289162, '#e64a19',
+                //     1397715000, '#e64a19',
+                // ]
+                ,'fill-outline-color': '#111111'
             }
         }, 'waterway-label');
 
@@ -255,20 +256,21 @@ $(document).ready(function () {
             'source-layer': 'gadm36_PHL-49t1ot',
             'maxzoom': 7,
             paint: {
-                'fill-color': [
-                    'interpolate',
-                    ['linear'],
-                    ['get', 'REGION'],
-                    0, '#ffffff',
-                    11646, '#edf8fb',
-                    174725666, '#ccece6',
-                    349437485, '#99d8c9',
-                    698863323, '#66c2a4',
-                    873576243, '#41ae76',
-                    1048289162, '#238b45',
-                    1397715000, '#005824',
-                ],
-                'fill-outline-color': '#777777'
+                'fill-color': '#b71c1c'
+                // [
+                //     'interpolate',
+                //     ['linear'],
+                //     ['get', 'REGION'],
+                //     0, '#e64a19',
+                //     11646, '#e64a19',
+                //     174725666, '#e64a19',
+                //     349437485, '#e64a19',
+                //     698863323, '#e64a19',
+                //     873576243, '#e64a19',
+                //     1048289162, '#e64a19',
+                //     1397715000, '#e64a19',
+                // ]
+                ,'fill-outline-color': '#111111'
             }
         }, 'waterway-label');
 
@@ -295,7 +297,7 @@ $(document).ready(function () {
                 }
             },
             paint: {
-                "text-color": "#ffffff",
+                "text-color": "#222222",
                 "text-opacity": 1
             }
         });
@@ -532,7 +534,7 @@ $(document).ready(function () {
             .attr("y", d => yScale(eval("d." + currentLevel)))
             .attr("width", d => xScale(d.filter) - 50)
             .attr("height", d => yScale.bandwidth())
-            .style("fill", "darkblue")
+            .style("fill", "#1e88e5")
 
         $("#explanation").text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
 
@@ -584,7 +586,7 @@ $(document).ready(function () {
             .attr("y", d => yScale(eval("d." + currentLevel)))
             .attr("width", d => xScale(d.mean) - 50)
             .attr("height", d => yScale.bandwidth())
-            .style("fill", "darkblue")
+            .style("fill", "#1e88e5")
     });
 
     $("#extraBar").css("display", "none");
@@ -642,7 +644,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", "darkblue");
+                            .style("fill", "#1e88e5");
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -650,7 +652,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", "darkblue");
+                                .style("fill", "#1e88e5");
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
@@ -828,7 +830,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.mean) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", "darkblue");
+                            .style("fill", "#1e88e5");
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -836,7 +838,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.mean) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", "darkblue");
+                                .style("fill", "#1e88e5");
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
@@ -895,7 +897,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.mean) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", "darkblue");
+                            .style("fill", "#1e88e5");
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -903,7 +905,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.mean) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", "darkblue");
+                                .style("fill", "#1e88e5");
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
