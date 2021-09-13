@@ -381,7 +381,7 @@ $(document).ready(function () {
 
     var w = 600;
     var h = 500;
-    var padding_left = 100;
+    var padding_left = 200;
     var padding = 50;
 
     var bar = d3.select("#bar").append("svg")
