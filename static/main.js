@@ -339,8 +339,6 @@ $(document).ready(function () {
                     .setHTML("<b>" + region_name + "</b><br><p>Correspondents: " + results.count + "</p><p>Average Spending for " + filterselect.val() + ": P" + results.filter.toFixed(2) + "</p>")
                     .addTo(map);
             });
-
-            $("#location").text("Selected Location: " + region_name);
         });
 
         map.on('click', 'prov', (e) => {
@@ -356,8 +354,6 @@ $(document).ready(function () {
                     .setHTML("<b>" + prov_name + "</b><br><p>Correspondents: " + result.count + "</p><p>Average Spending for " + filterselect.val() + ": P" + result.filter.toFixed(2) + "</p>")
                     .addTo(map);
             });
-
-            $("#location").text("Selected Location: " + e.features[0].properties['NAME_1']);
         });
 
         map.on('zoom', () => {
@@ -431,11 +427,11 @@ $(document).ready(function () {
         histo.append("g")
             .attr("id", "xAxisHisto")
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(xHisto));
+            .call(d3.axisBottom(xHisto).tickFormat(d3.format('.2s')));
 
         histo.append("g")
             .attr("id", "yAxisHisto")
-            .call(d3.axisLeft(yHisto));
+            .call(d3.axisLeft(yHisto).tickFormat(d3.format('.2s')));
 
         histo.append("text")
             .attr("id", "xtableText")
@@ -478,17 +474,14 @@ $(document).ready(function () {
             .range([height, 0]);
         yHisto.domain([0, d3.max(bins, function (d) { return d.length; })]);
 
-        var t = bar.transition()
-            .duration(1000);
-
         extraHistogram.append("g")
             .attr("id", "xAxisHisto")
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(xHisto));
+            .call(d3.axisBottom(xHisto).tickFormat(d3.format('.2s')));
 
         extraHistogram.append("g")
             .attr("id", "yAxisHisto")
-            .call(d3.axisLeft(yHisto));
+            .call(d3.axisLeft(yHisto).tickFormat(d3.format('.2s')));
 
         extraHistogram.append("text")
             .attr("id", "xtableText")
@@ -536,7 +529,8 @@ $(document).ready(function () {
             .rangeRound([padding, h - padding])
             .padding(0.1);
 
-        var xAxis = d3.axisBottom(xScale);
+        var xAxis = d3.axisBottom(xScale)
+            .tickFormat(d3.format('.2s'));
         var yAxis = d3.axisLeft(yScale);
 
         bar.append("g")
@@ -589,7 +583,8 @@ $(document).ready(function () {
             .rangeRound([padding, h - padding])
             .padding(0.1);
 
-        var xAxis = d3.axisBottom(xScale);
+        var xAxis = d3.axisBottom(xScale)
+            .tickFormat(d3.format('.2s'));
         var yAxis = d3.axisLeft(yScale);
 
         extraBar.append("g")
@@ -651,7 +646,8 @@ $(document).ready(function () {
                     .rangeRound([padding, h - padding])
                     .padding(0.1);
 
-                var xAxis = d3.axisBottom(xScale);
+                var xAxis = d3.axisBottom(xScale)
+                    .tickFormat(d3.format('.2s'));
                 var yAxis = d3.axisLeft(yScale);
 
                 var t = bar.transition()
@@ -775,13 +771,13 @@ $(document).ready(function () {
                 histo.select("#xAxisHisto")
                     .call(function (update) {
                         update.transition(t)
-                            .call(d3.axisBottom(xHisto));
+                            .call(d3.axisBottom(xHisto).tickFormat(d3.format('.2s')));
                     });
 
                 histo.select("#yAxisHisto")
                     .call(function (update) {
                         update.transition(t)
-                            .call(d3.axisLeft(yHisto));
+                            .call(d3.axisLeft(yHisto).tickFormat(d3.format('.2s')));
                     });
 
                 histo.select("#xtableText").text(selected_filter + " Spending (Pesos)");
@@ -842,7 +838,8 @@ $(document).ready(function () {
                     .rangeRound([padding, h - padding])
                     .padding(0.1);
 
-                var xAxis = d3.axisBottom(xScale);
+                var xAxis = d3.axisBottom(xScale)
+                    .tickFormat(d3.format('.2s'));
                 var yAxis = d3.axisLeft(yScale);
 
                 var t = bar.transition()
@@ -912,7 +909,8 @@ $(document).ready(function () {
                     .rangeRound([padding, h - padding])
                     .padding(0.1);
 
-                var xAxis = d3.axisBottom(xScale);
+                var xAxis = d3.axisBottom(xScale)
+                    .tickFormat(d3.format('.2s'));
                 var yAxis = d3.axisLeft(yScale);
 
                 var t = extraBar.transition()
@@ -984,13 +982,13 @@ $(document).ready(function () {
                 histo.select("#xAxisHisto")
                     .call(function (update) {
                         update.transition(t)
-                            .call(d3.axisBottom(xHisto));
+                            .call(d3.axisBottom(xHisto).tickFormat(d3.format('.2s')));
                     });
 
                 histo.select("#yAxisHisto")
                     .call(function (update) {
                         update.transition(t)
-                            .call(d3.axisLeft(yHisto));
+                            .call(d3.axisLeft(yHisto).tickFormat(d3.format('.2s')));
                     });
 
                 histo.select("#xtableText").text("Non-Essential Spending (Pesos)");
