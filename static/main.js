@@ -436,12 +436,20 @@ $(document).ready(function () {
                 d3.json('/' + currentLevel + '/essentials').then(function (data) {
                     fullData = data;
                     updateChoroplethMap(fullData, currentLevel);
+                    $("#bar").css("display", "block");
+                    $("#extraBar").css("display", "none");
+                    $("#histogram").css("display", "none");
+                    $("#extraHistogram").css("display", "block");
                 })
             } else if (onOff.textContent == 'Non-Essential') {
                 d3.json('/' + currentLevel + '/nonessentials').then(function (data) {
                     fullData = data;
                     updateChoroplethMap(fullData, currentLevel);
                 })
+                $("#bar").css("display", "none");
+                $("#extraBar").css("display", "block");
+                $("#histogram").css("display", "block");
+                $("#extraHistogram").css("display", "none");
             }
 
         }
@@ -708,8 +716,8 @@ $(document).ready(function () {
         var selected_filter = $("#filterselect").val();
 
         if (selected_filter != "Essential/Non Essential") {
-            $("#extraBar").css("display", "none");
-            $("#extraHistogram").css("display", "none");
+            // $("#extraBar").css("display", "none");
+            // $("#extraHistogram").css("display", "none");
             $(".toggle").css("display", "none");
 
             d3.json('/' + currentLevel + '/' + selected_filter).then(function (data) {
@@ -908,8 +916,12 @@ $(document).ready(function () {
                 $("#explanation").text(data[0].desc)
             });
         } else {
-            $("#extraBar").css("display", "block");
+            $("#bar").css("display", "none");
+                $("#extraBar").css("display", "block");
+                $("#histogram").css("display", "block");
+                $("#extraHistogram").css("display", "none");
             $(".toggle").css("display", "block");
+            
 
             d3.json('/' + currentLevel + '/essentials').then(function (data) {
                 fullData = data;
@@ -1127,7 +1139,7 @@ $(document).ready(function () {
                     )
             });
 
-            $("#extraHistogram").css("display", "block");
+            
         }
     });
 });
