@@ -343,7 +343,7 @@ $(document).ready(function () {
             var wages = 0;
             const onOff = toggle.parentNode.querySelector('.onoff')
 
-            if ($("#filterselect").val() == "Essential/Non Essential") {
+            if ($("#filterselect").val() == "Essential-Non Essential") {
                 if (onOff.textContent == 'Essential') {
                     d3.json('/' + currentLevel + '/essentials').then(function (data) {
                         results = data.find(obj => {
@@ -393,7 +393,7 @@ $(document).ready(function () {
             const onOff = toggle.parentNode.querySelector('.onoff')
 
 
-            if ($("#filterselect").val() == "Essential/Non Essential") {
+            if ($("#filterselect").val() == "Essential-Non Essential") {
                 if (onOff.textContent == 'Essential') {
                     d3.json('/' + currentLevel + '/essentials').then(function (data) {
                         result = data.find(obj => {
@@ -457,7 +457,7 @@ $(document).ready(function () {
 
         onOff.textContent = toggle.checked ? 'Essential' : 'Non-Essential'
 
-        if ($("#filterselect").val() == "Essential/Non Essential") {
+        if ($("#filterselect").val() == "Essential-Non Essential") {
             if (onOff.textContent == 'Essential') {
                 d3.json('/' + currentLevel + '/essentials').then(function (data) {
                     fullData = data;
@@ -747,7 +747,9 @@ $(document).ready(function () {
     $("#filterselect").on("change", function (event) {
         var selected_filter = $("#filterselect").val();
 
-        if (selected_filter != "Essential/Non Essential") {
+        $("#currFilter").text(selected_filter)
+
+        if (selected_filter != "Essential-Non Essential") {
             // $("#extraBar").css("display", "none");
             // $("#extraHistogram").css("display", "none");
             $(".toggle").css("display", "none");
@@ -947,9 +949,7 @@ $(document).ready(function () {
                     )
             });
 
-            d3.json('/descriptions/' + selected_filter).then(function (data) {
-                $("#explanation").text(data[0].desc)
-            });
+            
         } else {
             $("#bar").css("display", "none");
                 $("#extraBar").css("display", "block");
@@ -1182,5 +1182,8 @@ $(document).ready(function () {
 
             
         }
+        d3.json('/descriptions/' + selected_filter).then(function (data) {
+            $("#explanation").text(data[0].desc)
+        });
     });
 });
