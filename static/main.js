@@ -183,11 +183,37 @@ $(document).ready(function () {
     var filterselect = $("#filterselect");
     var currentLevel = 'region';
 
+    function binDataTo9(fullData, currentLevel) {
+        let ids = { region: 'reg', province: 'prov' };
+        let get_field = { region: 'REGION', province: 'NAME_1' };
+        let chunks = 9;
+        let final = []
+
+        bin9chunks = d3.bin()
+            .value(d => d.filter)
+            .thresholds((data, min, max) =>
+                d3.range(chunks).map(t => min + (t / chunks) * (max - min))
+            )
+
+        binnedData = bin9chunks(fullData);
+        binnedData.forEach((chunkGroup, i) => {
+            chunkGroup.forEach((area) => {
+                area.bin = i;
+                final.push(area);
+            })
+        })
+
+        console.log(final);
+        return final;
+    }
+
     function updateChoroplethMap(fullData, currentLevel) {
-        let ids = { region: 'reg', province: 'prov' }
+        let ids = { region: 'reg', province: 'prov' };
         let get_field = { region: 'REGION', province: 'NAME_1' };
         let colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
         let chunks = 9
+
+        binDataTo9(fullData, currentLevel)
         // bin filtered data into 9 chunks for choropleth map
         bin9chunks = d3.bin()
             .value(d => d.filter)
@@ -597,14 +623,14 @@ $(document).ready(function () {
             data = data.slice(0, 15);
         }
 
+        data = binDataTo9(data);
+        console.log(data)
+
         data.sort(function (a, b) { return b.filter - a.filter; });
 
         maxRatio = d3.max(data, function (d) { return d.filter; });
 
         minRatio = d3.min(data, function (d) { return d.filter; });
-
-        var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
-            .domain([minRatio, maxRatio]);
 
         regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -615,8 +641,10 @@ $(document).ready(function () {
             .rangeRound([padding, h - padding])
             .padding(0.1);
 
-        var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
-            .domain([minRatio, maxRatio]);
+        var colorScale = (data) => {
+            let colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
+            return colors[data.bin]
+        }
 
         var xAxis = d3.axisBottom(xScale)
             .tickFormat(d3.format('.2s'));
@@ -646,7 +674,7 @@ $(document).ready(function () {
             .attr("y", d => yScale(eval("d." + currentLevel)))
             .attr("width", d => xScale(d.filter) - 50)
             .attr("height", d => yScale.bandwidth())
-            .style("fill", d => colorScale(d.filter))
+            .style("fill", d => colorScale(d))
 
         d3.json('/descriptions/Total Expenditure').then(function (data) {
             $("#explanation").text(data[0].desc)
@@ -659,14 +687,17 @@ $(document).ready(function () {
             data = data.slice(0, 15);
         }
 
+        data = binDataTo9(data);
         data.sort(function (a, b) { return b.filter - a.filter; });
 
         maxRatio = d3.max(data, function (d) { return d.filter; });
 
         minRatio = d3.min(data, function (d) { return d.filter; });
 
-        var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
-            .domain([minRatio, maxRatio]);
+        var colorScale = (data) => {
+            let colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
+            return colors[data.bin]
+        }
 
         regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -705,7 +736,7 @@ $(document).ready(function () {
             .attr("y", d => yScale(eval("d." + currentLevel)))
             .attr("width", d => xScale(d.filter) - 50)
             .attr("height", d => yScale.bandwidth())
-            .style("fill", d => colorScale(d.filter))
+            .style("fill", d => colorScale(d))
 
         updateChoroplethMap(fullData, currentLevel);
     });
@@ -722,6 +753,7 @@ $(document).ready(function () {
 
             d3.json('/' + currentLevel + '/' + selected_filter).then(function (data) {
                 fullData = data;
+                data = binDataTo9(data);
                 updateChoroplethMap(fullData, currentLevel);
 
                 data.sort(function (a, b) { return b.filter - a.filter; });
@@ -734,8 +766,10 @@ $(document).ready(function () {
 
                 minRatio = d3.min(data, function (d) { return d.filter; });
 
-                var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
-                    .domain([minRatio, maxRatio]);
+                var colorScale = (data) => {
+                    let colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
+                    return colors[data.bin]
+                }
 
                 regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -775,7 +809,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", d => colorScale(d.filter));
+                            .style("fill", d => colorScale(d));
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -783,7 +817,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", d => colorScale(d.filter));
+                                .style("fill", d => colorScale(d));
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
@@ -924,6 +958,7 @@ $(document).ready(function () {
             
 
             d3.json('/' + currentLevel + '/essentials').then(function (data) {
+                data = binDataTo9(data);
                 fullData = data;
                 //console.log(fullData)
                 //updateChoroplethMap(fullData, currentLevel);
@@ -937,8 +972,10 @@ $(document).ready(function () {
 
                 minRatio = d3.min(data, function (d) { return d.filter; });
 
-                var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
-                    .domain([minRatio, maxRatio]);
+                var colorScale = (data) => {
+                    let colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
+                    return colors[data.bin]
+                }
 
                 regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -978,7 +1015,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", d => colorScale(d.filter));
+                            .style("fill", d => colorScale(d));
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -986,7 +1023,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", d => colorScale(d.filter));
+                                .style("fill", d => colorScale(d));
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
@@ -1002,6 +1039,7 @@ $(document).ready(function () {
 
             d3.json('/' + currentLevel + '/nonessentials').then(function (data) {
                 fullData = data;
+                data = binDataTo9(data);
                 updateChoroplethMap(fullData, currentLevel);
 
                 data.sort(function (a, b) { return b.filter - a.filter; });
@@ -1013,8 +1051,10 @@ $(document).ready(function () {
 
                 minRatio = d3.min(data, function (d) { return d.filter; });
 
-                var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
-                    .domain([minRatio, maxRatio]);
+                var colorScale = (data) => {
+                    let colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
+                    return colors[data.bin]
+                }
 
                 regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -1054,7 +1094,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", d => colorScale(d.filter));
+                            .style("fill", d => colorScale(d));
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -1062,7 +1102,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", d => colorScale(d.filter));
+                                .style("fill", d => colorScale(d));
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
