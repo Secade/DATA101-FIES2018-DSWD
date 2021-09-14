@@ -1,5 +1,6 @@
 $(document).ready(function () {
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2VjYWRlIiwiYSI6ImNrcnU3cHVnNDNvZHQycHRqZnZnNzQxYXQifQ.F-OV6UiB-D5fepALN_4stA';
+    const toggle = document.querySelector('.toggle input')
 
     const places = {
         'type': 'FeatureCollection',
@@ -229,12 +230,12 @@ $(document).ready(function () {
 
     map.on('load', () => {
 
-        map.on('click', function (e) {
-            console.log(e);
-            console.log(map.getCenter());
-            console.log(map.getZoom());
-            console.log(e.lngLat)
-        });
+        // map.on('click', function (e) {
+        //     console.log(e);
+        //     console.log(map.getCenter());
+        //     console.log(map.getZoom());
+        //     console.log(e.lngLat)
+        // });
 
         map.addControl(new mapboxgl.NavigationControl());
 
@@ -256,19 +257,6 @@ $(document).ready(function () {
             'minzoom': 7,
             paint: {
                 'fill-color': '#b71c1c'
-                // [
-                //     'interpolate',
-                //     ['linear'],
-                //     ['get', 'REGION'],
-                //     0, '#e64a19',
-                //     11646, '#e64a19',
-                //     174725666, '#e64a19',
-                //     349437485, '#e64a19',
-                //     698863323, '#e64a19',
-                //     873576243, '#e64a19',
-                //     1048289162, '#e64a19',
-                //     1397715000, '#e64a19',
-                // ]
                 , 'fill-outline-color': '#111111'
             }
         }, 'waterway-label');
@@ -281,19 +269,6 @@ $(document).ready(function () {
             'maxzoom': 7,
             paint: {
                 'fill-color': '#b71c1c'
-                // [
-                //     'interpolate',
-                //     ['linear'],
-                //     ['get', 'REGION'],
-                //     0, '#e64a19',
-                //     11646, '#e64a19',
-                //     174725666, '#e64a19',
-                //     349437485, '#e64a19',
-                //     698863323, '#e64a19',
-                //     873576243, '#e64a19',
-                //     1048289162, '#e64a19',
-                //     1397715000, '#e64a19',
-                // ]
                 , 'fill-outline-color': '#111111'
             }
         }, 'waterway-label');
@@ -329,31 +304,95 @@ $(document).ready(function () {
         map.on('click', 'reg', (e) => {
             region_name = e.features[0].properties['REGION'];
             var results = -1;
+            var wages = 0;
+            const onOff = toggle.parentNode.querySelector('.onoff')
 
-            d3.json('/reg/' + filterselect.val()).then(function (data) {
-                results = data.find(obj => {
-                    return obj.region === region_name
+            if ($("#filterselect").val() == "Essential/Non Essential") {
+                if (onOff.textContent == 'Essential') {
+                    d3.json('/' + currentLevel + '/essentials').then(function (data) {
+                        results = data.find(obj => {
+                            return obj.region === region_name
+                        });
+                        new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML("<b>" + region_name + "</b><br><p>Average Spending for Essentials: P" + results.filter.toFixed(2) + "</p>")
+                            .addTo(map);
+                    });
+                } else {
+                    d3.json('/' + currentLevel + '/nonessentials').then(function (data) {
+                        results = data.find(obj => {
+                            return obj.region === region_name
+                        });
+                        new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML("<b>" + region_name + "</b><br><p>Average Spending for Non-Essentials: P" + results.filter.toFixed(2) + "</p>")
+                            .addTo(map);
+                    });
+                }
+
+            } else {
+
+                d3.json('/wage/' + region_name).then(function (data) {
+                    wages = data[0].wage
                 });
-                new mapboxgl.Popup()
-                    .setLngLat(e.lngLat)
-                    .setHTML("<b>" + region_name + "</b><br><p>Correspondents: " + results.count + "</p><p>Average Spending for " + filterselect.val() + ": P" + results.filter.toFixed(2) + "</p>")
-                    .addTo(map);
-            });
+
+                d3.json('/reg/' + filterselect.val()).then(function (data) {
+                    results = data.find(obj => {
+                        return obj.region === region_name
+                    });
+                    new mapboxgl.Popup()
+                        .setLngLat(e.lngLat)
+                        .setHTML("<b>" + region_name + "</b><br><p>Correspondents: " + results.count + "</p><p>Average Spending for " + filterselect.val() + ": P" + results.filter.toFixed(2) + "</p><p>Minimum Wage: P" + wages + "</p>")
+                        .addTo(map);
+                });
+            }
+
+
+
         });
 
         map.on('click', 'prov', (e) => {
             prov_name = e.features[0].properties['NAME_1'];
             var result = -1;
+            const onOff = toggle.parentNode.querySelector('.onoff')
 
-            d3.json('/prov/' + filterselect.val()).then(function (data) {
-                result = data.find(obj => {
-                    return obj.province === prov_name
+
+            if ($("#filterselect").val() == "Essential/Non Essential") {
+                if (onOff.textContent == 'Essential') {
+                    d3.json('/' + currentLevel + '/essentials').then(function (data) {
+                        result = data.find(obj => {
+                            return obj.province === prov_name
+                        });
+                        new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML("<b>" + prov_name + "</b><br><p>Average Spending for Essentials: P" + result.filter.toFixed(2) + "</p>")
+                            .addTo(map);
+                    });
+                } else {
+                    d3.json('/' + currentLevel + '/nonessentials').then(function (data) {
+                        result = data.find(obj => {
+                            return obj.province === prov_name
+                        });
+                        new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML("<b>" + prov_name + "</b><br><p>Average Spending for Non-Essentials: P" + result.filter.toFixed(2) + "</p>")
+                            .addTo(map);
+                    });
+                }
+
+            } else {
+
+                d3.json('/prov/' + filterselect.val()).then(function (data) {
+                    result = data.find(obj => {
+                        return obj.province === prov_name
+                    });
+                    new mapboxgl.Popup()
+                        .setLngLat(e.lngLat)
+                        .setHTML("<b>" + prov_name + "</b><br><p>Correspondents: " + result.count + "</p><p>Average Spending for " + filterselect.val() + ": P" + result.filter.toFixed(2) + "</p>")
+                        .addTo(map);
                 });
-                new mapboxgl.Popup()
-                    .setLngLat(e.lngLat)
-                    .setHTML("<b>" + prov_name + "</b><br><p>Correspondents: " + result.count + "</p><p>Average Spending for " + filterselect.val() + ": P" + result.filter.toFixed(2) + "</p>")
-                    .addTo(map);
-            });
+            }
+
         });
 
         map.on('zoom', () => {
@@ -367,15 +406,38 @@ $(document).ready(function () {
                 $("#filterselect").val($("#filterselect").val()).change();
                 map.setLayoutProperty('poi-labels', 'visibility', 'visible');
             }
+
         });
 
         d3.json('/region/Total Expenditure').then(function (data) {
+            console.log(data)
             updateChoroplethMap(data, currentLevel);
         });
-
     });
 
-    var w = 600;
+
+    toggle.addEventListener('click', () => {
+        const onOff = toggle.parentNode.querySelector('.onoff')
+
+        onOff.textContent = toggle.checked ? 'Essential' : 'Non-Essential'
+
+        if ($("#filterselect").val() == "Essential/Non Essential") {
+            if (onOff.textContent == 'Essential') {
+                d3.json('/' + currentLevel + '/essentials').then(function (data) {
+                    fullData = data;
+                    updateChoroplethMap(fullData, currentLevel);
+                })
+            } else if (onOff.textContent == 'Non-Essential') {
+                d3.json('/' + currentLevel + '/nonessentials').then(function (data) {
+                    fullData = data;
+                    updateChoroplethMap(fullData, currentLevel);
+                })
+            }
+
+        }
+    })
+
+    var w = 645;
     var h = 500;
     var padding_left = 200;
     var padding = 50;
@@ -509,6 +571,7 @@ $(document).ready(function () {
     });
 
     $("#extraHistogram").css("display", "none");
+    $(".toggle").css("display", "none");
 
     d3.json('/region/Total Expenditure').then(function (data) {
 
@@ -520,6 +583,11 @@ $(document).ready(function () {
 
         maxRatio = d3.max(data, function (d) { return d.filter; });
 
+        minRatio = d3.min(data, function (d) { return d.filter; });
+
+        var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
+            .domain([minRatio, maxRatio]);
+
         regions = data.map(function (d) { return eval("d." + currentLevel); });
 
         xScale = d3.scaleLinear([0, maxRatio], [padding, w - padding_left]);
@@ -528,6 +596,9 @@ $(document).ready(function () {
             .domain(regions)
             .rangeRound([padding, h - padding])
             .padding(0.1);
+
+        var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
+            .domain([minRatio, maxRatio]);
 
         var xAxis = d3.axisBottom(xScale)
             .tickFormat(d3.format('.2s'));
@@ -557,7 +628,7 @@ $(document).ready(function () {
             .attr("y", d => yScale(eval("d." + currentLevel)))
             .attr("width", d => xScale(d.filter) - 50)
             .attr("height", d => yScale.bandwidth())
-            .style("fill", "#1e88e5")
+            .style("fill", d => colorScale(d.filter))
 
         d3.json('/descriptions/Total Expenditure').then(function (data) {
             $("#explanation").text(data[0].desc)
@@ -570,9 +641,14 @@ $(document).ready(function () {
             data = data.slice(0, 15);
         }
 
-        data.sort(function (a, b) { return b.mean - a.mean; });
+        data.sort(function (a, b) { return b.filter - a.filter; });
 
-        maxRatio = d3.max(data, function (d) { return d.mean; });
+        maxRatio = d3.max(data, function (d) { return d.filter; });
+
+        minRatio = d3.min(data, function (d) { return d.filter; });
+
+        var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
+            .domain([minRatio, maxRatio]);
 
         regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -609,9 +685,9 @@ $(document).ready(function () {
             .join("rect")
             .attr("x", padding_left + 1)
             .attr("y", d => yScale(eval("d." + currentLevel)))
-            .attr("width", d => xScale(d.mean) - 50)
+            .attr("width", d => xScale(d.filter) - 50)
             .attr("height", d => yScale.bandwidth())
-            .style("fill", "#1e88e5")
+            .style("fill", d=>colorScale(d.filter))
 
         updateChoroplethMap(fullData, currentLevel);
     });
@@ -624,6 +700,7 @@ $(document).ready(function () {
         if (selected_filter != "Essential/Non Essential") {
             $("#extraBar").css("display", "none");
             $("#extraHistogram").css("display", "none");
+            $(".toggle").css("display", "none");
 
             d3.json('/' + currentLevel + '/' + selected_filter).then(function (data) {
                 fullData = data;
@@ -636,6 +713,11 @@ $(document).ready(function () {
                 }
 
                 maxRatio = d3.max(data, function (d) { return d.filter; });
+
+                minRatio = d3.min(data, function (d) { return d.filter; });
+        
+                var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
+                    .domain([minRatio, maxRatio]);
 
                 regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -675,7 +757,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", "#1e88e5");
+                            .style("fill", d => colorScale(d.filter));
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -683,7 +765,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", "#1e88e5");
+                                .style("fill", d => colorScale(d.filter));
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
@@ -817,17 +899,24 @@ $(document).ready(function () {
             });
         } else {
             $("#extraBar").css("display", "block");
+            $(".toggle").css("display", "block");
 
             d3.json('/' + currentLevel + '/essentials').then(function (data) {
                 fullData = data;
-                updateChoroplethMap(fullData, currentLevel);
+                console.log(fullData)
+                //updateChoroplethMap(fullData, currentLevel);
 
-                data.sort(function (a, b) { return b.mean - a.mean; });
+                data.sort(function (a, b) { return b.filter - a.filter; });
                 if (currentLevel == 'province') {
                     data = data.slice(0, 15);
                 }
 
-                maxRatio = d3.max(data, function (d) { return d.mean; });
+                maxRatio = d3.max(data, function (d) { return d.filter; });
+
+                minRatio = d3.min(data, function (d) { return d.filter; });
+        
+                var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
+                    .domain([minRatio, maxRatio]);
 
                 regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -865,17 +954,17 @@ $(document).ready(function () {
                         enter.append("rect")
                             .attr("x", padding_left + 1)
                             .attr("y", d => yScale(eval("d." + currentLevel)))
-                            .attr("width", d => xScale(d.mean) - 50)
+                            .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", "#1e88e5");
+                            .style("fill", d=>colorScale(d.filter));
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
                                 .attr("x", padding_left + 1)
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
-                                .attr("width", d => xScale(d.mean) - 50)
+                                .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", "#1e88e5");
+                                .style("fill", d=>colorScale(d.filter));
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
@@ -893,12 +982,17 @@ $(document).ready(function () {
                 fullData = data;
                 updateChoroplethMap(fullData, currentLevel);
 
-                data.sort(function (a, b) { return b.mean - a.mean; });
+                data.sort(function (a, b) { return b.filter - a.filter; });
                 if (currentLevel == 'province') {
                     data = data.slice(0, 15);
                 }
 
-                maxRatio = d3.max(data, function (d) { return d.mean; });
+                maxRatio = d3.max(data, function (d) { return d.filter; });
+
+                minRatio = d3.min(data, function (d) { return d.filter; });
+        
+                var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
+                    .domain([minRatio, maxRatio]);
 
                 regions = data.map(function (d) { return eval("d." + currentLevel); });
 
@@ -936,17 +1030,17 @@ $(document).ready(function () {
                         enter.append("rect")
                             .attr("x", padding_left + 1)
                             .attr("y", d => yScale(eval("d." + currentLevel)))
-                            .attr("width", d => xScale(d.mean) - 50)
+                            .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", "#1e88e5");
+                            .style("fill", d=>colorScale(d.filter));
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
                                 .attr("x", padding_left + 1)
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
-                                .attr("width", d => xScale(d.mean) - 50)
+                                .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", "#1e88e5");
+                                .style("fill", d=>colorScale(d.filter));
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")

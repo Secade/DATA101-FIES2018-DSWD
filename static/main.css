@@ -28,11 +28,10 @@ body {
 #sidebar{
   position: fixed;
   width: 35%;
-  height: 96%;
+  height: 96.6%;
   padding-top: 1%;
   padding-left: 10px;
   background-color: #f3f3f3;
-  /* Temporary Font */
   font-family: 'Kaisei HarunoUmi', serif;
   color: #424242;
   overflow: auto;
@@ -57,4 +56,61 @@ hr{
 #selectfilter{
   text-align: center;
   
+}
+
+.toggle {
+  position: absolute;
+  padding-left: 50%;
+  padding-bottom: 20px;
+}
+
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle .onoff {
+  font-size: 12px;
+  text-align: center;
+  display: block;
+
+}
+
+.slider {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  background-color: #333;
+  transition: 0.4s;
+  width: 50px;
+  height: 30px;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 10px;
+  width: 10px;
+  background-color: #fff;
+  transition: 0.4s;
+  top: 10px;
+  left: 10px;
+}
+
+input:checked + .slider {
+  background-color: #fd5d00;
+  box-shadow: 0 0 12px #fd5d00;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.slider.round {
+  border-radius: 20px;
+}
+.slider.round::before {
+  border-radius: 20px;
 }

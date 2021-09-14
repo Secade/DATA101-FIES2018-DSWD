@@ -24,6 +24,17 @@ def get_desc(filter):
     data_json = gg.to_json(orient="records")
     return Response(data_json, mimetype="application/json")
 
+@app.route('/wage/<region>')
+def get_wage(region):
+    df = pd.read_csv("Minimum Wage.csv")
+
+    gk = df.groupby('region')
+
+    gg = gk.get_group(region)
+
+    data_json = gg.to_json(orient="records")
+    return Response(data_json, mimetype="application/json")
+
 @app.route('/prov/<population>')
 def get_prov_population_data(population):
     df = pd.read_csv(data_url)
@@ -118,7 +129,7 @@ def get_region_nonessentials():
 
     ss = pd.DataFrame(df_test)
     sss = ss[['Sugar, Jam and Honey, Chocolate and Confectionery','Alcoholic Beverages','Tobacco','Recreation and Culture','Special Family Occasion']].mean(axis=1).reset_index()
-    sss.columns = ['region', 'mean']
+    sss.columns = ['region', 'filter']
 
     filtered_df= pd.DataFrame(sss).to_json(orient="records")
 
@@ -136,7 +147,7 @@ def get_region_essentials():
 
     ss = pd.DataFrame(df_test)
     sss = ss[['Health','Education','Clothing and Footwear','Transport','Communication','Food & Water']].mean(axis=1).reset_index()
-    sss.columns = ['region', 'mean']
+    sss.columns = ['region', 'filter']
 
     filtered_df= pd.DataFrame(sss).to_json(orient="records")
 
@@ -151,7 +162,7 @@ def get_province_nonessentials():
 
     ss = pd.DataFrame(df_test)
     sss = ss[['Sugar, Jam and Honey, Chocolate and Confectionery','Alcoholic Beverages','Tobacco','Recreation and Culture','Special Family Occasion']].mean(axis=1).reset_index()
-    sss.columns = ['province', 'mean']
+    sss.columns = ['province', 'filter']
 
     filtered_df= pd.DataFrame(sss).to_json(orient="records")
 
@@ -169,7 +180,7 @@ def get_province_essentials():
 
     ss = pd.DataFrame(df_test)
     sss = ss[['Health','Education','Clothing and Footwear','Transport','Communication','Food & Water']].mean(axis=1).reset_index()
-    sss.columns = ['province', 'mean']
+    sss.columns = ['province', 'filter']
 
     filtered_df= pd.DataFrame(sss).to_json(orient="records")
 
