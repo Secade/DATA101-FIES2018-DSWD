@@ -13,16 +13,16 @@ def get_data():
     data_json = df.to_json(orient="records")
     return Response(data_json, mimetype="application/json")
 
-@app.route('/descriptions/<filter>')
-def get_desc(filter):
-    df = pd.read_csv("Filter Descriptions.csv")
+# @app.route('/descriptions/<filter>')
+# def get_desc(filter):
+#     df = pd.read_csv("Filter Descriptions.csv")
 
-    gk = df.groupby('filter')
+#     gk = df.groupby('filter')
 
-    gg = gk.get_group(filter)
+#     gg = gk.get_group(filter)
 
-    data_json = gg.to_json(orient="records")
-    return Response(data_json, mimetype="application/json")
+#     data_json = gg.to_json(orient="records")
+#     return Response(data_json, mimetype="application/json")
 
 @app.route('/wage/<region>')
 def get_wage(region):
