@@ -676,6 +676,10 @@ $(document).ready(function () {
             .attr("height", d => yScale.bandwidth())
             .style("fill", d => colorScale(d))
 
+        // d3.json('/descriptions/Total Expenditure').then(function (data) {
+        //     $("#explanation").text(data[0].desc)
+        // })
+
         $("#explanation").text("This graph shows us the general expenditure behavior of Filipino households through the total expenses incurred by a Filipino household. It can be observed that in terms of regional averages, there is a great disparity between regions. This can be accounted towards the varying consumer price index that greatly differs across the different regions of the country as well. Similar to other household expenses categories, regions NCR, 4-A, and 3 naturally leads the regional average on total expenditure by spending around two hundred fifty thousand to three hundred fifty thousand pesos. Generally, it can be observed that Filipino households normally spend around one hundred to two hundred fifty thousand pesos towards household expenditures.")
     });
 
@@ -1176,9 +1180,18 @@ $(document).ready(function () {
                     }
                     )
             });
-
-
         }
+
+        //REASONING FOR SWITCH CASE:
+        //- The function below is the original code to load the filter descriptions however,
+        //the heroku server is overloading due to length of the paragraph that is placed into 1 data cell.
+        //This is why there is a switch case here for the description to load in the herokue server without overloading.
+        //If this was run locally, the commented code below would load the description properly.
+
+        // d3.json('/descriptions/'+selected_filter).then(function (data) {
+        //     $("#explanation").text(data[0].desc)
+        // })
+
         var desc = "";
 
         switch (selected_filter) {
