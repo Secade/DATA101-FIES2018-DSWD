@@ -677,7 +677,8 @@ $(document).ready(function () {
             .style("fill", d => colorScale(d))
 
         d3.json('/descriptions/Total Expenditure').then(function (data) {
-            $("#explanation").text(data[0].desc)
+            //$("#explanation").text(data[0].desc)
+            $("#explanation").text("      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam faucibus scelerisque molestie. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In sodales rhoncus urna non commodo. Morbi et aliquam justo. Fusce auctor eros non libero sagittis posuere. Curabitur rhoncus ex ut orci ultrices bibendum. Ut sit amet sollicitudin tellus. Fusce quis auctor orci, iaculis elementum lectus. Ut odio purus, tempor quis est id, dictum ornare odio. Maecenas commodo commodo fringilla. Ut lacinia et mauris id hendrerit.")
         });
     });
 
