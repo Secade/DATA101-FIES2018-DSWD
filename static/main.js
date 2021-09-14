@@ -184,11 +184,10 @@ $(document).ready(function () {
     var currentLevel = 'region';
 
     function updateChoroplethMap(fullData, currentLevel) {
-        ids = { region: 'reg', province: 'prov' }
-        get_field = { region: 'REGION', province: 'NAME_1' };
-
-        colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
-        chunks = 9
+        let ids = { region: 'reg', province: 'prov' }
+        let get_field = { region: 'REGION', province: 'NAME_1' };
+        let colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
+        let chunks = 9
         // bin filtered data into 9 chunks for choropleth map
         bin9chunks = d3.bin()
             .value(d => d.filter)
@@ -198,7 +197,18 @@ $(document).ready(function () {
 
         const matchExpression = ['match', ['get', get_field[currentLevel]]];
         // Calculate color values for each region
-        bin9chunks(fullData).forEach((chunkGroup, i) => {
+        binnedData = bin9chunks(fullData);
+
+        binnedData.forEach((chunkGroup, i) => {
+            //layers.push(`₱${chunkGroup.x0.toFixed(0)} - ₱${chunkGroup.x1.toFixed(0)}`);
+            // update legend values
+            if (i == 0) {
+                //console.log($('#legendRangeMin'))
+                $('#legendRangeMin').text(`₱${chunkGroup.x0.toFixed(0)}`);
+            } else if (i == binnedData.length - 1) {
+                $('#legendRangeMax').text(`₱${chunkGroup.x1.toFixed(0)}`);
+            }
+
             chunkGroup.forEach((area) => {
                 matchExpression.push(area[currentLevel], colors[i])
             })
@@ -410,7 +420,7 @@ $(document).ready(function () {
         });
 
         d3.json('/region/Total Expenditure').then(function (data) {
-            console.log(data)
+            //console.log(data)
             updateChoroplethMap(data, currentLevel);
         });
     });
@@ -687,7 +697,7 @@ $(document).ready(function () {
             .attr("y", d => yScale(eval("d." + currentLevel)))
             .attr("width", d => xScale(d.filter) - 50)
             .attr("height", d => yScale.bandwidth())
-            .style("fill", d=>colorScale(d.filter))
+            .style("fill", d => colorScale(d.filter))
 
         updateChoroplethMap(fullData, currentLevel);
     });
@@ -715,7 +725,7 @@ $(document).ready(function () {
                 maxRatio = d3.max(data, function (d) { return d.filter; });
 
                 minRatio = d3.min(data, function (d) { return d.filter; });
-        
+
                 var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
                     .domain([minRatio, maxRatio]);
 
@@ -903,7 +913,7 @@ $(document).ready(function () {
 
             d3.json('/' + currentLevel + '/essentials').then(function (data) {
                 fullData = data;
-                console.log(fullData)
+                //console.log(fullData)
                 //updateChoroplethMap(fullData, currentLevel);
 
                 data.sort(function (a, b) { return b.filter - a.filter; });
@@ -914,7 +924,7 @@ $(document).ready(function () {
                 maxRatio = d3.max(data, function (d) { return d.filter; });
 
                 minRatio = d3.min(data, function (d) { return d.filter; });
-        
+
                 var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
                     .domain([minRatio, maxRatio]);
 
@@ -956,7 +966,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", d=>colorScale(d.filter));
+                            .style("fill", d => colorScale(d.filter));
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -964,7 +974,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", d=>colorScale(d.filter));
+                                .style("fill", d => colorScale(d.filter));
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
@@ -990,7 +1000,7 @@ $(document).ready(function () {
                 maxRatio = d3.max(data, function (d) { return d.filter; });
 
                 minRatio = d3.min(data, function (d) { return d.filter; });
-        
+
                 var colorScale = d3.scaleSequential(d3.interpolate("#ffffcc", "#800026"))
                     .domain([minRatio, maxRatio]);
 
@@ -1032,7 +1042,7 @@ $(document).ready(function () {
                             .attr("y", d => yScale(eval("d." + currentLevel)))
                             .attr("width", d => xScale(d.filter) - 50)
                             .attr("height", d => yScale.bandwidth())
-                            .style("fill", d=>colorScale(d.filter));
+                            .style("fill", d => colorScale(d.filter));
                     }, function (update) {
                         update.call(function (update) {
                             update.transition(t)
@@ -1040,7 +1050,7 @@ $(document).ready(function () {
                                 .attr("y", d => yScale(eval("d." + currentLevel)))
                                 .attr("width", d => xScale(d.filter) - 50)
                                 .attr("height", d => yScale.bandwidth())
-                                .style("fill", d=>colorScale(d.filter));
+                                .style("fill", d => colorScale(d.filter));
                         })
                     }, function (exit) {
                         exit.attr("fill", "#cccccc")
