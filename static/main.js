@@ -183,11 +183,10 @@ $(document).ready(function () {
     var currentLevel = 'region';
 
     function updateChoroplethMap(fullData, currentLevel) {
-        ids = { region: 'reg', province: 'prov' }
-        get_field = { region: 'REGION', province: 'NAME_1' };
-
-        colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
-        chunks = 9
+        let ids = { region: 'reg', province: 'prov' }
+        let get_field = { region: 'REGION', province: 'NAME_1' };
+        let colors = ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']
+        let chunks = 9
         // bin filtered data into 9 chunks for choropleth map
         bin9chunks = d3.bin()
             .value(d => d.filter)
@@ -197,7 +196,18 @@ $(document).ready(function () {
 
         const matchExpression = ['match', ['get', get_field[currentLevel]]];
         // Calculate color values for each region
-        bin9chunks(fullData).forEach((chunkGroup, i) => {
+        binnedData = bin9chunks(fullData);
+    
+        binnedData.forEach((chunkGroup, i) => {
+            //layers.push(`₱${chunkGroup.x0.toFixed(0)} - ₱${chunkGroup.x1.toFixed(0)}`);
+            // update legend values
+            if (i == 0) {
+                console.log($('#legendRangeMin'))
+                $('#legendRangeMin').text(`₱${chunkGroup.x0.toFixed(0)}`);
+            } else if (i == binnedData.length - 1) {
+                $('#legendRangeMax').text(`₱${chunkGroup.x1.toFixed(0)}`);
+            }
+
             chunkGroup.forEach((area) => {
                 matchExpression.push(area[currentLevel], colors[i])
             })
@@ -624,6 +634,7 @@ $(document).ready(function () {
         if (selected_filter != "Essential/Non Essential") {
             $("#extraBar").css("display", "none");
             $("#extraHistogram").css("display", "none");
+            $("#ene-toggle").css("display", "none");
 
             d3.json('/' + currentLevel + '/' + selected_filter).then(function (data) {
                 fullData = data;
@@ -816,6 +827,7 @@ $(document).ready(function () {
                 $("#explanation").text(data[0].desc)
             });
         } else {
+            $("#ene-toggle").css("display", "block");
             $("#extraBar").css("display", "block");
 
             d3.json('/' + currentLevel + '/essentials').then(function (data) {
