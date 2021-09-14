@@ -85,7 +85,7 @@ def get_filters():
     , 'Milk, Cheese and Eggs', 'Oils and Fats','Fruit','Vegetables','Sugar, Jam and Honey, Chocolate and Confectionery','Coffee, Tea and Cocoa'
     ,'Alcoholic Beverages','Tobacco','Recreation and Culture','Special Family Occasion', 'Income Difference']]
     df_filter = list(df_actual.columns)
-    df_filter.append("Essential/Non Essential")
+    df_filter.append("Essential-Non Essential")
 
     filtered_df= pd.DataFrame(df_filter).to_json(orient="records")
 
